@@ -111,37 +111,57 @@ for i in range(len(eb_m)): # use 2 Gyr iso for no good reason
     else:
         eb_linf[i] = eb_lum[i] / eb_l_mod[i]
     eb_linf_err[i] = eb_linf[i] * np.sqrt( (2.*eb_r_err[i]/eb_r[i])**2. + (4.*eb_teff_err[i]/eb_teff[i])**2. + (eb_l_mod_err[i]/eb_l_mod[i])**2. )   
-#	eb_rinf_err[i] = math.sqrt(pow(eb
+    eb_rinf[i] -= 1.0
+    eb_teffinf[i] -= 1.0
+    eb_linf[i] -= 1.0
 	   
-print("DEBCat M-dwarf names, periods, rinf, tinf, and linf:")
+print("DEBCat ID", "\t\t\t", "Period(d)", "\t\t", "Rad. inf. (O-C; %)", "\t", "Rad. inf. err. (%)", "\t", "Teff. supp. (O-C; %)", "\t", "Teff. supp. err (%)", "\t", "Lum. inf. (O-C; %)", "\t", "Lum inf. err. (%)")
 for i in range(len(eb_p)):
-	print(eb_names[i], eb_p[i], eb_rinf[i], "+/-", eb_rinf_err[i], eb_teffinf[i], "+/-", eb_teffinf_err[i], eb_linf[i], "+/-", eb_linf_err[i])
+	print(eb_names[i], "\t", eb_p[i], "\t", eb_rinf[i]*100., "\t", eb_rinf_err[i]*100., "\t", eb_teffinf[i]*100., "\t", eb_teffinf_err[i]*100., "\t", eb_linf[i]*100., "\t", eb_linf_err[i]*100.)
 
 np.savetxt('output.out',[(eb_names[i], eb_p[i], eb_rinf[i], eb_rinf_err[i], eb_teffinf[i], eb_teffinf_err[i], eb_linf[i], eb_linf_err[i]) for i in range(len(eb_p))], delimiter='\t', fmt=('%s'), header='name per rinf rinf_err tinf tinf_err linf linf_err')
 
+
+###### Plot it all ######
+deb_mkr = 'o'
+deb_clr = 'grey'
+deb_mkreclr = deb_clr
+deb_fl = 'full' #'none'
+deb_msz = 4
+deb_a = 1#0.5
+deb_lbl = r'${\rm DEBCat\ M\ Dwarfs}$'
+lbl_fsz = 14
+
 fig = plt.figure(figsize=(5,3))
-plt.errorbar(eb_p,np.array(eb_rinf),yerr=eb_rinf_err,linestyle='',color='grey')
-plt.scatter(eb_p,np.array(eb_rinf),color='grey',label=r'${\rm DEBCat\ M\ Dwarfs}$')
-plt.axhline(1.0,linestyle='--',color='k')
-plt.xlim([0.1,100])
-plt.ylim([0.9,1.3])
-plt.legend(loc='upper left')
-plt.xlabel(r'$\rm Period\ (days)$',fontsize=16)
-plt.ylabel(r'$R_{\rm obs}/R_{\rm model}$',fontsize=16)
+plt.errorbar(eb_p, eb_rinf*100., yerr=eb_rinf_err*100., linestyle='', color=deb_clr, marker=deb_mkr, markersize=deb_msz, fillstyle=deb_fl, label=deb_lbl, alpha=deb_a)
+#plt.axvline(6.5,color='k',linestyle='dotted')
+plt.axhline(0.0,linestyle='--',color='k')
+plt.xlim(0.4,100)
+plt.ylim(-5,30)
+plt.legend(loc='best')
+#plt.xlabel(r'$\rm Orbital Period\ (days)$',fontsize=lbl_fsz)
+plt.xlabel("Orbital Period (days)",fontsize=lbl_fsz)
+plt.ylabel("Radius Inflation (%)", fontsize=lbl_fsz)
+#plt.ylabel(r'$\frac{\Delta R}{R} (\%)$', fontsize=lbl_fsz)
+#plt.ylabel(r'$R_{\rm obs}/R_{\rm model}$',fontsize=16)
+#plt.ylabel(r'$(R_{\rm obs} - R_{\rm mod}$/R_{\rm mod} (\%)$',fontsize=lbl_fsz)
 plt.xscale('log')
-plt.tight_layout()
+plt.tight_layout()#plt.show()
 plt.savefig("rinf_debcat.pdf")
 plt.savefig("rinf_debcat.png", dpi=1200)
 
 
 fig2 = plt.figure(figsize=(5,3))
-plt.errorbar(eb_p,eb_teffinf,yerr=eb_teffinf_err,linestyle='',color='grey')
-plt.scatter(eb_p,eb_teffinf,color='grey',label='DEBCat M Dwarfs')
+plt.errorbar(eb_p, eb_teffinf*100., yerr=eb_teffinf_err*100., linestyle='', color=deb_clr, marker=deb_mkr, markersize=deb_msz, fillstyle=deb_fl, label=deb_lbl, alpha=deb_a)
 plt.axhline(1.0,linestyle='--',color='k')
-plt.xlim([0.1,100])
-plt.legend(loc='best')
-plt.xlabel(r'$\rm Period\ (days)$',fontsize=16)
-plt.ylabel(r'$T_{\rm eff,\ obs}/T_{\rm eff,\ model}$',fontsize=16)
+plt.xlim(0.4,100)
+plt.ylim(-20,10)
+plt.legend(loc='upper left')
+#plt.xlabel(r'$\rm Period\ (days)$',fontsize=16)
+#plt.ylabel(r'$\frac{\Delta T_{\rm eff}}{T_{\rm eff}} (\%)$', fontsize=lbl_fsz)
+#plt.ylabel(r'$T_{\rm eff,\ obs}/T_{\rm eff,\ model}$',fontsize=16)
+plt.xlabel("Orbital Period (days)",fontsize=lbl_fsz)
+plt.ylabel("Temperature\n Suppression (%)", fontsize=lbl_fsz)
 plt.xscale('log')
 plt.tight_layout()
 plt.savefig('tinf_debcat.pdf')
